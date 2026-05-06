@@ -56,14 +56,23 @@ Serve localmente a versao gerada pelo build.
 
 ## Deploy no GitHub Pages
 
-O projeto esta preparado para publicar pelo GitHub Actions.
+O projeto esta preparado para publicar pelo modo classico do GitHub Pages usando a pasta `docs/`.
 
-Depois de enviar os arquivos para o GitHub:
+Gere a versao de producao:
+
+```bash
+npm run build
+```
+
+Esse comando cria/atualiza a pasta `docs/`.
+
+Depois envie os arquivos para o GitHub e configure:
 
 1. Acesse `Settings` > `Pages` no repositorio.
-2. Em `Build and deployment`, selecione `GitHub Actions`.
-3. Faca um push na branch `main`.
-4. Aguarde a action `Deploy to GitHub Pages` finalizar.
+2. Em `Build and deployment`, selecione `Deploy from a branch`.
+3. Em `Branch`, escolha `main`.
+4. Em `Folder`, escolha `/docs`.
+5. Salve e aguarde o GitHub Pages publicar.
 
 O site sera publicado no endereco indicado pelo proprio GitHub Pages, geralmente:
 
