@@ -2,7 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyState } from "../components/common/EmptyState";
 import { RatingFeedbackOverlay } from "../components/study/RatingFeedbackOverlay";
 import { StudyCard } from "../components/study/StudyCard";
-import { StudyFilters, type StudyFilterState } from "../components/study/StudyFilters";
+import {
+  StudyFilters,
+  type RatingControlsLayout,
+  type RatingControlsSide,
+  type StudyFilterState,
+} from "../components/study/StudyFilters";
 import { StudyProgress } from "../components/study/StudyProgress";
 import { getPublishedFlashcards } from "../services/flashcardStorage";
 import { getUserProgress, saveUserCardProgress } from "../services/progressStorage";
@@ -23,6 +28,47 @@ const initialFilters: StudyFilterState = {
   reviewAll: false,
 };
 
+const RATING_CONTROLS_SIDE_KEY = "flashmeds.ratingControlsSide.v1";
+const RATING_CONTROLS_LAYOUT_KEY = "flashmeds.ratingControlsLayout.v1";
+
+function getRatingControlsLayout(): RatingControlsLayout {
+  try {
+    const stored = localStorage.getItem(RATING_CONTROLS_LAYOUT_KEY);
+    return stored === "grid" || stored === "row" ? stored : "grid";
+  } catch {
+    return "grid";
+  }
+}
+
+function getRatingControlsSide(): RatingControlsSide {
+  try {
+    const stored = localStorage.getItem(RATING_CONTROLS_SIDE_KEY);
+    return stored === "left" || stored === "right" ? stored : "right";
+  } catch {
+    return "right";
+  }
+}
+
+function saveRatingControlsLayout(layout: RatingControlsLayout): RatingControlsLayout {
+  try {
+    localStorage.setItem(RATING_CONTROLS_LAYOUT_KEY, layout);
+  } catch {
+    // The preference is optional; the in-memory state still updates.
+  }
+
+  return layout;
+}
+
+function saveRatingControlsSide(side: RatingControlsSide): RatingControlsSide {
+  try {
+    localStorage.setItem(RATING_CONTROLS_SIDE_KEY, side);
+  } catch {
+    // The preference is optional; the in-memory state still updates.
+  }
+
+  return side;
+}
+
 export function StudyPage({ onBack }: StudyPageProps) {
   const [flashcards] = useState<Flashcard[]>(() => getPublishedFlashcards());
   const [progress, setProgress] = useState<UserCardProgress[]>(() => getUserProgress(LOCAL_USER_ID));
@@ -30,6 +76,10 @@ export function StudyPage({ onBack }: StudyPageProps) {
   const [answeredCount, setAnsweredCount] = useState(0);
   const [isAnswerVisible, setIsAnswerVisible] = useState(false);
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
+  const [ratingControlsLayout, setRatingControlsLayout] =
+    useState<RatingControlsLayout>(getRatingControlsLayout);
+  const [ratingControlsSide, setRatingControlsSide] =
+    useState<RatingControlsSide>(getRatingControlsSide);
   const [feedbackRating, setFeedbackRating] = useState<ReviewRating | null>(null);
   const [isCardLeaving, setIsCardLeaving] = useState(false);
   const advanceTimeoutRef = useRef<number | null>(null);
@@ -130,7 +180,19 @@ export function StudyPage({ onBack }: StudyPageProps) {
 
       <div className="study-filter-slot">
         {areFiltersVisible ? (
-          <StudyFilters flashcards={flashcards} filters={filters} onChange={setFilters} />
+          <StudyFilters
+            flashcards={flashcards}
+            filters={filters}
+            ratingControlsLayout={ratingControlsLayout}
+            ratingControlsSide={ratingControlsSide}
+            onChange={setFilters}
+            onRatingControlsLayoutChange={(layout) =>
+              setRatingControlsLayout(saveRatingControlsLayout(layout))
+            }
+            onRatingControlsSideChange={(side) =>
+              setRatingControlsSide(saveRatingControlsSide(side))
+            }
+          />
         ) : null}
       </div>
 
@@ -144,6 +206,8 @@ export function StudyPage({ onBack }: StudyPageProps) {
           onRate={handleRate}
           isRatingDisabled={Boolean(feedbackRating)}
           isLeaving={isCardLeaving}
+          ratingControlsLayout={ratingControlsLayout}
+          ratingControlsSide={ratingControlsSide}
         />
       ) : (
         <EmptyState

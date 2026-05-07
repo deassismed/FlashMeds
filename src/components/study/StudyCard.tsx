@@ -11,6 +11,8 @@ type StudyCardProps = {
   onRate: (rating: ReviewRating) => void;
   isRatingDisabled?: boolean;
   isLeaving?: boolean;
+  ratingControlsSide?: "left" | "right";
+  ratingControlsLayout?: "grid" | "row";
 };
 
 export function StudyCard({
@@ -21,11 +23,13 @@ export function StudyCard({
   onRate,
   isRatingDisabled = false,
   isLeaving = false,
+  ratingControlsSide = "right",
+  ratingControlsLayout = "grid",
 }: StudyCardProps) {
   const visibleText = isAnswerVisible ? flashcard.answer : flashcard.question;
   const fitConfig = isAnswerVisible
-    ? { maxFontSize: 42, minFontSize: 21, lineHeight: 1.18 }
-    : { maxFontSize: 58, minFontSize: 26, lineHeight: 1.14 };
+    ? { maxFontSize: 46, minFontSize: 23, lineHeight: 1.16 }
+    : { maxFontSize: 64, minFontSize: 28, lineHeight: 1.12 };
 
   return (
     <article
@@ -49,7 +53,12 @@ export function StudyCard({
       </button>
 
       {isAnswerVisible ? (
-        <RatingButtons disabled={isRatingDisabled} onRate={onRate} />
+        <RatingButtons
+          controlsLayout={ratingControlsLayout}
+          controlsSide={ratingControlsSide}
+          disabled={isRatingDisabled}
+          onRate={onRate}
+        />
       ) : null}
     </article>
   );

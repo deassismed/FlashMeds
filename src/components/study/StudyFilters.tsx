@@ -9,13 +9,28 @@ export type StudyFilterState = {
   reviewAll: boolean;
 };
 
+export type RatingControlsSide = "left" | "right";
+export type RatingControlsLayout = "grid" | "row";
+
 type StudyFiltersProps = {
   flashcards: Flashcard[];
   filters: StudyFilterState;
+  ratingControlsLayout: RatingControlsLayout;
+  ratingControlsSide: RatingControlsSide;
   onChange: (filters: StudyFilterState) => void;
+  onRatingControlsLayoutChange: (layout: RatingControlsLayout) => void;
+  onRatingControlsSideChange: (side: RatingControlsSide) => void;
 };
 
-export function StudyFilters({ flashcards, filters, onChange }: StudyFiltersProps) {
+export function StudyFilters({
+  flashcards,
+  filters,
+  ratingControlsLayout,
+  ratingControlsSide,
+  onChange,
+  onRatingControlsLayoutChange,
+  onRatingControlsSideChange,
+}: StudyFiltersProps) {
   const areas = unique(flashcards.map((flashcard) => flashcard.area));
   const themes = unique(flashcards.map((flashcard) => flashcard.theme));
   const difficulties = unique(flashcards.map((flashcard) => flashcard.difficulty));
@@ -49,6 +64,30 @@ export function StudyFilters({ flashcards, filters, onChange }: StudyFiltersProp
         options={types}
         onChange={(type) => onChange({ ...filters, type: type as StudyFilterState["type"] })}
       />
+      <label className="field">
+        <span>Posicao</span>
+        <select
+          value={ratingControlsSide}
+          onChange={(event) =>
+            onRatingControlsSideChange(event.target.value as RatingControlsSide)
+          }
+        >
+          <option value="right">Direita</option>
+          <option value="left">Esquerda</option>
+        </select>
+      </label>
+      <label className="field">
+        <span>Formato</span>
+        <select
+          value={ratingControlsLayout}
+          onChange={(event) =>
+            onRatingControlsLayoutChange(event.target.value as RatingControlsLayout)
+          }
+        >
+          <option value="grid">2 x 2</option>
+          <option value="row">Lado a lado</option>
+        </select>
+      </label>
       <label className="toggle-field">
         <input
           type="checkbox"
